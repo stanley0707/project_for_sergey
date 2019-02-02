@@ -155,7 +155,7 @@ class BaseCianProcessor(ParamsURLCian):
     
     file_name = ''
     file = ''
-    driver = webdriver.Chrome(executable_path='/usr/local/bin/chromedriver')
+    driver = webdriver.Chrome(executable_path=r"/usr/local/bin/chromedriver")
     url = ''
 
 
@@ -221,10 +221,16 @@ class BaseCianProcessor(ParamsURLCian):
         
         book = openpyxl.Workbook(self.file)
         book.save(self.file)
-        
+        i = 0
         for t in child:
-            phone = self.driver.execute_script(open("reader.js").read(), t)
-           
+            
+            phone = self.driver.execute_script("""
+                document.getElementsByClassName('button_component-default-55Cf8OHDN6g')[{}].click()
+var matches = document.body.querySelectorAll('.c6e8ba5398-simplified-text--1mkqT')[{}];
+return matches.innerText""".format(i, i), t)
+            #self.driver.execute_script("matches =  ", t)
+
+            
             try:
                 price = t.find_element_by_class_name('c6e8ba5398-header--no6qJ').text
             
@@ -260,7 +266,9 @@ class BaseCianProcessor(ParamsURLCian):
                 'url':  url,
             }
 
+            i += 1
             self.result.append(data)
+            self.driver.execute_script("matches = undefined")
 
 
 class CianProcessor(BaseCianProcessor):
